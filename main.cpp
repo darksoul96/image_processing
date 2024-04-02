@@ -104,11 +104,16 @@ int main(int argc, //number of strings in argv
         
             int argumentCount = 2;
             vector<String> windowsOpened;
+            int coordinateX = 0;
+            int coordinateY = 0;
             while (argumentCount < argc) {
                 if (strcmp(argv[argumentCount], "-s") == 0 || strcmp(argv[argumentCount], "-show") == 0) {
                     String showWindow = "original";
                     namedWindow(showWindow); 
                     imshow(showWindow, image); 
+                    moveWindow(showWindow, coordinateX, coordinateY);
+                    coordinateX += 500;
+                    coordinateY += 200;
                     windowsOpened.push_back(showWindow);
                 } else if (strcmp(argv[argumentCount], "-n") == 0 || strcmp(argv[argumentCount], "-negative") == 0) {
                     //Negative image
@@ -117,6 +122,9 @@ int main(int argc, //number of strings in argv
                     String negativeWindow = "negative"; 
                     namedWindow(negativeWindow); 
                     imshow(negativeWindow, negativeImage); 
+                    moveWindow(negativeWindow, coordinateX, coordinateY);
+                    coordinateX += 500;
+                    coordinateY += 200;
                     windowsOpened.push_back(negativeWindow);
                 } else if (strcmp(argv[argumentCount], "-bnw") == 0 || strcmp(argv[argumentCount], "-blacknwhite") == 0) {
                     //Black and white image
@@ -125,6 +133,9 @@ int main(int argc, //number of strings in argv
                     String blackAndWhiteWindow = "black and white"; 
                     namedWindow(blackAndWhiteWindow); 
                     imshow(blackAndWhiteWindow, blackAndWhiteImage); 
+                    moveWindow(blackAndWhiteWindow, coordinateX, coordinateY);
+                    coordinateX += 500;
+                    coordinateY += 200;
                     windowsOpened.push_back(blackAndWhiteWindow);
                 }
                 argumentCount++;
