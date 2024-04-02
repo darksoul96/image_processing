@@ -8,7 +8,7 @@
 using namespace cv;
 using namespace std;
 
-Mat& ScanImageAndReduceC(Mat& I) {
+Mat& scanImageAndInvertColors(Mat& I) {
     // accept only char type matrices
     CV_Assert(I.depth() == CV_8U);
 
@@ -36,6 +36,41 @@ Mat& ScanImageAndReduceC(Mat& I) {
     return I;
 }
 
+
+Mat& scanImageAndTurnBlackAndWhite(Mat& I) {
+    // accept only char type matrices
+    CV_Assert(I.depth() == CV_8U);
+
+    int channels = I.channels();
+    int nRows = I.rows;
+    int nCols = I.cols;
+
+    if (I.isContinuous()) {
+        nCols *= nRows;
+        nRows = 1;
+    }
+
+    int i,j;
+    for (i = 0; i < nRows; ++i) {
+        for (j = 0; j < nCols; ++j) {
+            Vec3b& pixel = I.at<Vec3b>(i, j);
+            float average = (pixel[0] + pixel[1] + pixel[2])/3.0;
+            if (average > 128) {
+                pixel[0] = 255;
+                pixel[1] = 255;
+                pixel[2] = 255;
+            } else {
+                pixel[0] = 0;
+                pixel[1] = 0;
+                pixel[2] = 0;
+            }
+            
+        }
+    }
+    return I;
+}
+
+
 int main(int argc, //number of strings in argv
          char** argv) {
     
@@ -51,6 +86,9 @@ int main(int argc, //number of strings in argv
             cout << "   -h, -help:    show help " << endl;
             cout << "   -s, -show:    show image " << endl;
             cout << "   -n, -negative:    show negative image " << endl;
+            cout << "   -bnw, -blacknwhite:    show black and white image " << endl;
+        } else {
+            cout << "Enter a jpg or png image as first argument followed by flag command. Enter -h or -help to show help." << endl;
         }
     } else if (argc == 3) {
         imageName = argv[1];
@@ -65,17 +103,43 @@ int main(int argc, //number of strings in argv
             }
 
             if (strcmp(argv[2], "-s") == 0 || strcmp(argv[2], "-show") == 0) {
-                String windowName = "Show image"; //Name of the window
+                String showWindow = "original";
+                namedWindow(showWindow); 
+                imshow(showWindow, image); 
+                waitKey(0); 
+                destroyWindow(showWindow); 
+            } else if (strcmp(argv[2], "-n") == 0 || strcmp(argv[2], "-negative") == 0) {
+                //Original image
+                String showWindow = "original"; 
+                namedWindow(showWindow); 
+                imshow(showWindow, image); 
 
-                namedWindow(windowName); // Create a window
+                //Negative image
+                scanImageAndInvertColors(image);
+                String negativeWindow = "negative"; 
+                namedWindow(negativeWindow); 
+                imshow(negativeWindow, image); 
 
-                imshow(windowName, image); // Show our image inside the created window.
+                //Destroy windows on key press
+                waitKey(0);
+                destroyWindow(negativeWindow); 
+                destroyWindow(showWindow);
+            } else if (strcmp(argv[2], "-bnw") == 0 || strcmp(argv[2], "-blacknwhite") == 0) {
+                //Original image
+                String showWindow = "original"; 
+                namedWindow(showWindow); 
+                imshow(showWindow, image); 
 
-                waitKey(0); // Wait for any keystroke in the window
+                //Black and white image
+                scanImageAndTurnBlackAndWhite(image);
+                String blackAndWhiteWindow = "black and white"; 
+                namedWindow(blackAndWhiteWindow); 
+                imshow(blackAndWhiteWindow, image); 
 
-                destroyWindow(windowName); //destroy the created window
-                //ScanImageAndReduceC(image);
-            } else if (strcmp(argv[2], "-s") == 0 || strcmp(argv[2], "-show") == 0) {
+                //Destroy windows on key press
+                waitKey(0);
+                destroyWindow(blackAndWhiteWindow); 
+                destroyWindow(showWindow);
                 
             }
 
