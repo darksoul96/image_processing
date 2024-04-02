@@ -90,7 +90,7 @@ int main(int argc, //number of strings in argv
         } else {
             cout << "Enter a jpg or png image as first argument followed by flag command. Enter -h or -help to show help." << endl;
         }
-    } else if (argc == 3) {
+    } else if (argc >= 3) {
         imageName = argv[1];
         if ((imageName.find(".jpg") || imageName.find(".png")) != string::npos) {
             // Read the image file
@@ -101,51 +101,46 @@ int main(int argc, //number of strings in argv
                 cin.get(); //wait for any key press
                 return -1;
             }
-
-            if (strcmp(argv[2], "-s") == 0 || strcmp(argv[2], "-show") == 0) {
-                String showWindow = "original";
-                namedWindow(showWindow); 
-                imshow(showWindow, image); 
-                waitKey(0); 
-                destroyWindow(showWindow); 
-            } else if (strcmp(argv[2], "-n") == 0 || strcmp(argv[2], "-negative") == 0) {
-                //Original image
-                String showWindow = "original"; 
-                namedWindow(showWindow); 
-                imshow(showWindow, image); 
-
-                //Negative image
-                scanImageAndInvertColors(image);
-                String negativeWindow = "negative"; 
-                namedWindow(negativeWindow); 
-                imshow(negativeWindow, image); 
-
-                //Destroy windows on key press
-                waitKey(0);
-                destroyWindow(negativeWindow); 
-                destroyWindow(showWindow);
-            } else if (strcmp(argv[2], "-bnw") == 0 || strcmp(argv[2], "-blacknwhite") == 0) {
-                //Original image
-                String showWindow = "original"; 
-                namedWindow(showWindow); 
-                imshow(showWindow, image); 
-
-                //Black and white image
-                scanImageAndTurnBlackAndWhite(image);
-                String blackAndWhiteWindow = "black and white"; 
-                namedWindow(blackAndWhiteWindow); 
-                imshow(blackAndWhiteWindow, image); 
-
-                //Destroy windows on key press
-                waitKey(0);
-                destroyWindow(blackAndWhiteWindow); 
-                destroyWindow(showWindow);
+        
+            int argumentCount = 2;
+            vector<String> windowsOpened;
+            while (argumentCount < argc) {
+                if (strcmp(argv[argumentCount], "-s") == 0 || strcmp(argv[argumentCount], "-show") == 0) {
+                    String showWindow = "original";
+                    namedWindow(showWindow); 
+                    imshow(showWindow, image); 
+                    windowsOpened.push_back(showWindow);
+                } else if (strcmp(argv[argumentCount], "-n") == 0 || strcmp(argv[argumentCount], "-negative") == 0) {
+                    //Negative image
+                    Mat negativeImage = image.clone();
+                    scanImageAndInvertColors(negativeImage);
+                    String negativeWindow = "negative"; 
+                    namedWindow(negativeWindow); 
+                    imshow(negativeWindow, negativeImage); 
+                    windowsOpened.push_back(negativeWindow);
+                } else if (strcmp(argv[argumentCount], "-bnw") == 0 || strcmp(argv[argumentCount], "-blacknwhite") == 0) {
+                    //Black and white image
+                    Mat blackAndWhiteImage = image.clone();
+                    scanImageAndTurnBlackAndWhite(blackAndWhiteImage);
+                    String blackAndWhiteWindow = "black and white"; 
+                    namedWindow(blackAndWhiteWindow); 
+                    imshow(blackAndWhiteWindow, blackAndWhiteImage); 
+                    windowsOpened.push_back(blackAndWhiteWindow);
+                }
+                argumentCount++;
                 
             }
-
+            waitKey(0);
+            for (int i=0;i<windowsOpened.size(); ++i) {
+                destroyWindow(windowsOpened[i]);
+            }
         } else {
             cout << "Enter a jpg or png image as first argument followed by flag command. Enter -h or -help to show help." << endl;
         }
+
+            
+
+        
     } else {
         cout << "Enter command followed by -h or -help to show help" << endl;
         return -1;
